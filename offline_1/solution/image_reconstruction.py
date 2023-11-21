@@ -22,12 +22,14 @@ if __name__ == '__main__':
 
     print("grayscaled image shape: " + str(grayscaled_img.shape))
     
-    k = int(input(f"Enter the rank (< {min(n, m)}) of the approximation: "))
-
-    for i in range(k, min(n, m)):
+    min_rank = min(n, m)
+    for i in range(1, min_rank, min_rank // 10):
         approximated_img = low_rank_approximation(grayscaled_img, i)
-        print(f"Rank {i} approximation: ")
-        cv.imshow("Approximated image", approximated_img)
+        # plot the resultant k-rank approximation as a grayscale image
+        cv.imshow(f"{i}-rank approximation", approximated_img)
         cv.waitKey(0)
+        cv.destroyAllWindows()
+        cv.imwrite(f"approximations/{i}-rank approximation.jpg", approximated_img)
+
 
     
