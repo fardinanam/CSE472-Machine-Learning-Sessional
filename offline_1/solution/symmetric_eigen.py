@@ -1,17 +1,11 @@
 import numpy as np
-
-INT_MIN = -1e9
-INT_MAX = 1e9
+import random_eigen as re
 
 def rand_invertible_symmetric_matrix(n: int) -> np.ndarray:
-    """Generate a random n x n invertible symmetric matrix."""
-    global INT_MAX, INT_MIN
-    while True:
-        A = np.random.randint(INT_MIN // 2, INT_MAX // 2, size=(n, n))
-        A = A + A.T
+    """returns a random n x n invertible symmetric matrix."""
 
-        if np.linalg.det(A) != 0:
-            return A
+    A = re.rand_invertible_matrix(n)
+    return A @ A.T
 
 if __name__ == "__main__":
     n = int(input("Enter the size of the square matrix: "))

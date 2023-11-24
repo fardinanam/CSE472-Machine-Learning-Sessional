@@ -1,17 +1,23 @@
 import numpy as np
 
-INT_MAX = 1e9
-INT_MIN = -1e9
+INT_MAX = 1e5
+INT_MIN = -1e5
 
-def rand_invertible_matrix(n: int) -> np.ndarray:
-    """Generate a random n x n invertible matrix."""
+def diagonally_dominant_matrix(n: int) -> np.ndarray:
+    """returns random n x n diagonally dominant matrix."""
+
     global INT_MAX, INT_MIN
     A = np.random.randint(INT_MIN, INT_MAX, size=(n, n))
 
-    while np.linalg.det(A) == 0:
-        A = np.random.rand(n, n)
+    for i in range(n):
+        A[i, i] = np.sum(np.abs(A[i, :])) + 1
 
     return A
+
+def rand_invertible_matrix(n: int) -> np.ndarray:
+    """returns a random n x n invertible matrix."""
+
+    return diagonally_dominant_matrix(n)
 
 if __name__ == "__main__":
     n = int(input("Enter the size of the square matrix: "))

@@ -14,8 +14,8 @@ if __name__ == '__main__':
     aspect_ratio = img.shape[0] / img.shape[1]
     img = cv.resize(img, (HORIZONTAL_LENGTH, int(HORIZONTAL_LENGTH * aspect_ratio)))
     grayscaled_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    cv.imshow("Original image", grayscaled_img)
-    cv.waitKey(0)
+    # cv.imshow("Original image", grayscaled_img)
+    # cv.waitKey(0)
 
     n = grayscaled_img.shape[0]
     m = grayscaled_img.shape[1]
@@ -23,7 +23,7 @@ if __name__ == '__main__':
     print("grayscaled image shape: " + str(grayscaled_img.shape))
     
     max_rank = min(n, m)
-    # for i in range(1, min_rank, min_rank // 10):
+
     while(True):
         k = int(input(f"Rank of the image k (1 <= k <={max_rank}): "))
 
@@ -37,6 +37,3 @@ if __name__ == '__main__':
         cv.waitKey(0)
         cv.destroyAllWindows()
         cv.imwrite(f"approximations/{k}-rank approximation.jpg", approximated_img)
-
-
-    
