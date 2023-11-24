@@ -22,14 +22,21 @@ if __name__ == '__main__':
 
     print("grayscaled image shape: " + str(grayscaled_img.shape))
     
-    min_rank = min(n, m)
-    for i in range(1, min_rank, min_rank // 10):
-        approximated_img = low_rank_approximation(grayscaled_img, i)
+    max_rank = min(n, m)
+    # for i in range(1, min_rank, min_rank // 10):
+    while(True):
+        k = int(input(f"Rank of the image k (1 <= k <={max_rank}): "))
+
+        if k <= 0 or k > max_rank:
+            print(f"Invalid rank k. Please enter a value between 1 and {max_rank}.")
+            continue
+        
+        approximated_img = np.array(low_rank_approximation(grayscaled_img, k), dtype=np.uint8)
         # plot the resultant k-rank approximation as a grayscale image
-        cv.imshow(f"{i}-rank approximation", approximated_img)
+        cv.imshow(f"{k}-rank approximation", approximated_img)
         cv.waitKey(0)
         cv.destroyAllWindows()
-        cv.imwrite(f"approximations/{i}-rank approximation.jpg", approximated_img)
+        cv.imwrite(f"approximations/{k}-rank approximation.jpg", approximated_img)
 
 
     
