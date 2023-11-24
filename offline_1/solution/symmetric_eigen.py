@@ -2,7 +2,19 @@ import numpy as np
 import random_eigen as re
 
 def rand_invertible_symmetric_matrix(n: int) -> np.ndarray:
-    """returns a random n x n invertible symmetric matrix."""
+    """
+    Generate a random n x n invertible symmetric matrix
+
+    Parameters
+    ----------
+        n : int 
+            The dimension of the matrix
+    
+    Returns
+    -------
+        out : np.array
+            A random n x n invertible symmetric matrix
+    """
 
     A = re.rand_invertible_matrix(n)
     return A @ A.T

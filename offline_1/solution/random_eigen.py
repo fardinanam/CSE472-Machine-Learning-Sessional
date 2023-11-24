@@ -4,7 +4,19 @@ INT_MAX = 1e5
 INT_MIN = -1e5
 
 def diagonally_dominant_matrix(n: int) -> np.ndarray:
-    """returns random n x n diagonally dominant matrix."""
+    """
+    Generate a random n x n diagonally dominant matrix.
+
+    Parameters
+    ----------
+    n : int
+        The dimension of the matrix.
+
+    Returns
+    -------
+        out : np.array
+            A random n x n diagonally dominant matrix.
+    """
 
     global INT_MAX, INT_MIN
     A = np.random.randint(INT_MIN, INT_MAX, size=(n, n))
@@ -15,7 +27,19 @@ def diagonally_dominant_matrix(n: int) -> np.ndarray:
     return A
 
 def rand_invertible_matrix(n: int) -> np.ndarray:
-    """returns a random n x n invertible matrix."""
+    """
+    Generate a random n x n invertible matrix.
+
+    Parameters
+    ----------
+        n : int 
+            The dimension of the matrix.
+
+    Returns
+    -------
+        out : np.array
+            A random n x n invertible matrix.
+    """
 
     return diagonally_dominant_matrix(n)
 
