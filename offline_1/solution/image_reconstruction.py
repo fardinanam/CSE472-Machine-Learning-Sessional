@@ -1,5 +1,7 @@
 import cv2 as cv
 import numpy as np
+import matplotlib.pyplot as plt
+import math
 
 HORIZONTAL_LENGTH = 500
 
@@ -24,7 +26,7 @@ def low_rank_approximation(A: np.ndarray, k: int) -> np.ndarray:
     return A_k
 
 if __name__ == '__main__':
-    img = cv.imread('image.jpeg')
+    img = cv.imread('image.jpg')
     aspect_ratio = img.shape[0] / img.shape[1]
     img = cv.resize(img, (HORIZONTAL_LENGTH, int(HORIZONTAL_LENGTH * aspect_ratio)))
     grayscaled_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -36,16 +38,18 @@ if __name__ == '__main__':
     
     max_rank = min(n, m)
 
-    while(True):
-        k = int(input(f"Rank of the image k (1 <= k <={max_rank}): "))
+    plt.figure(figsize=(15, 15))
 
-        if k <= 0 or k > max_rank:
-            print(f"Invalid rank k. Please enter a value between 1 and {max_rank}.")
-            continue
-        
+    count = 0
+    k_start = int(input(f"Start rank k (1 <= k <={max_rank}): "))
+    k_end = int(input(f"End rank k ({k_start + 10} < k <={max_rank}): "))
+    k_count = 10
+
+    for k in range(k_start, k_end + 1, (k_end - k_start) // k_count + 1):
         approximated_img = np.array(low_rank_approximation(grayscaled_img, k), dtype=np.uint8)
-        # plot the resultant k-rank approximation as a grayscale image
-        cv.imshow(f"{k}-rank approximation", approximated_img)
-        cv.waitKey(0)
-        cv.destroyAllWindows()
-        cv.imwrite(f"approximations/{k}-rank approximation.jpg", approximated_img)
+        count += 1
+        plt.subplot(3, 4, count)
+        plt.title(f"{k}-rank approximation")
+        plt.imshow(approximated_img, cmap="gray")
+    
+    plt.show()
