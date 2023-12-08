@@ -25,7 +25,6 @@ class Preprocessor:
 
         # consider all columns other than numeric columns as categorical columns
         categorical_cells = list(set(self.data.columns) - set(self.numeric_features))
-        print ("Categorical cells:", categorical_cells)
 
         # fill missing values of categorical columns with "UNKNOWN_VALUE"
         self.data[categorical_cells] = self.data[categorical_cells].fillna("UNKNOWN_VALUE")

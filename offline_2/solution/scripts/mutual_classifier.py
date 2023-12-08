@@ -45,9 +45,6 @@ def gain(X : np.ndarray, y : np.ndarray, feature_index : int) -> float:
     return gain
 
 def info_gain_score(X : np.ndarray, y : np.ndarray) -> np.ndarray:
-    # find entropy of y
-    y_entropy = entropy(y)
-
     # find the number of features
     n_features = X.shape[1]
 
@@ -67,7 +64,7 @@ class SelectKBest():
         self.k = k
         self.scores_ = []
 
-    def fit(self, X, y=None):
+    def fit(self, X : np.ndarray, y : np.ndarray):
         self.scores_ = self.score_func(X, y)
         return self
 
