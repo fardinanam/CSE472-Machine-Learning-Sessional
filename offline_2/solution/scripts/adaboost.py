@@ -36,33 +36,38 @@ class AdaBoost(Learner):
             The fitted model
         """
         n = X.shape[0] # number of examples
-        w = np.ones(n) / n # vector of N example weights
+        w = np.ones((n, 1)) / n # vector of N example weights
 
-        epsilon = 1e-6 # to avoid division by zero
+        epsilon = 1e-7 # to avoid division by zero
 
+        np.random.seed(51)
         for _ in range(epochs):
             # resample the data
-            indices = np.random.choice(n, n, p=w)
+            indices = np.random.choice(n, n, p=w.flatten())
             X_resampled = X[indices]
             y_resampled = y[indices]
 
             learner = self.learner()
-            learner.fit(X_resampled, y_resampled, epochs=1000)
+            # learner.fit(X_resampled, y_resampled, epochs=1000)
+            learner.fit(X_resampled, y_resampled)
             self.h.append(learner)
 
             error = 0
 
             for i in range(n):
-                if learner.predict(X[i]) != y[i]:
+                X_i = np.reshape(X[i], (1, -1))
+                if learner.predict(X_i) != y[i]:
                     error += w[i]
 
             if error > self.error_threshold:
+                self.z.append(math.log((1 - self.error_threshold) / self.error_threshold))
                 continue
             
-            error = min(error, 1 - epsilon)
+            # error = min(error, 1 - epsilon)
 
             for i in range(n):
-                if learner.predict(X[i]) != y[i]:
+                X_i = np.reshape(X[i], (1, -1))
+                if learner.predict(X_i) == y[i]:
                     w[i] *= error / (1 - error)
             
             # normalize the weights
@@ -72,7 +77,7 @@ class AdaBoost(Learner):
         
         return self
 
-    def predict(self, x):
+    def predict(self, x : np.ndarray) -> np.ndarray:
         """
         Predict the label for a single example.
         
@@ -86,18 +91,27 @@ class AdaBoost(Learner):
         y : np.ndarray
             The predicted label having values in {-1, 1}
         """
-        y_preds = np.array([h.predict(x) for h in self.h])
-        # self.z = np.array(self.z)
+        # y_preds = np.array([h.predict(x) for h in self.h])
+        # y_preds = np.reshape(y_preds, (len(self.h), x.shape[0]))
+        # print("y_preds shape: ", y_preds.shape)
+        # print("z shape: ", len(self.z))
 
-        # print(f"z shape: {np.array(self.z).shape}")
-        # print(f"z: {self.z}")
-        # print(f"y_preds shape: {y_preds.shape}")
-        # print(f"y_preds: {y_preds}")
+        # return np.sign(np.dot(self.z, y_preds))
+        z = np.array(self.z)
+        z = z / z.sum()
+        y_pred = np.zeros(x.shape[0])
 
-        return np.sign(np.dot(self.z, y_preds))
+        for i in range(len(self.h)):
+            pred = self.h[i].predict(x)
+            y_pred += z[i] * self.h[i].predict(x).flatten()
 
+        for i in range(len(y_pred)):
+            if y_pred[i] > 0.5:
+                y_pred[i] = 1
+            else:
+                y_pred[i] = 0
 
-            
+        return y_pred            
 
 
 

@@ -39,6 +39,10 @@ class Preprocessor:
         1. Encode to 0 or 1 if there are only two categories
         2. One-hot encode if there are more than two categories
         """
+        # if no categorical features, return the dataframe as it is
+        if not self.categorical_features:
+            return self.data
+        
         # one hot encode categorical features
         dummies = pd.get_dummies(self.data[self.categorical_features], drop_first=True)
 
