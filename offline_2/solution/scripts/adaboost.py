@@ -91,18 +91,11 @@ class AdaBoost(Learner):
         y : np.ndarray
             The predicted label having values in {-1, 1}
         """
-        # y_preds = np.array([h.predict(x) for h in self.h])
-        # y_preds = np.reshape(y_preds, (len(self.h), x.shape[0]))
-        # print("y_preds shape: ", y_preds.shape)
-        # print("z shape: ", len(self.z))
-
-        # return np.sign(np.dot(self.z, y_preds))
         z = np.array(self.z)
         z = z / z.sum()
         y_pred = np.zeros(x.shape[0])
 
         for i in range(len(self.h)):
-            pred = self.h[i].predict(x)
             y_pred += z[i] * self.h[i].predict(x).flatten()
 
         for i in range(len(y_pred)):

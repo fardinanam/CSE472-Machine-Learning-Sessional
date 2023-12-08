@@ -7,7 +7,7 @@ class LogisticRegression(Learner):
         self.alpha = alpha
         self.error_threshold = error_threshold
 
-    def fit(self, X : np.ndarray, y : np.ndarray, epochs:int=1000) -> np.ndarray:
+    def fit(self, X : np.ndarray, y : np.ndarray, epochs:int=1500) -> np.ndarray:
         # check if x and y are 1D arrays
         if len(X.shape) == 1:
             X = np.reshape(X, (X.size, 1))

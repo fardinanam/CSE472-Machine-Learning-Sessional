@@ -1,13 +1,44 @@
 import pandas as pd
 import numpy as np
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler
 
 class Preprocessor:
     def __init__(self, data : pd.DataFrame) -> None:
         self.data = data
         self.numeric_features = data.select_dtypes(include=[np.number]).columns
         self.categorical_features = list(set(data.columns) - set(self.numeric_features))
+    
+    def split(self) -> list:
+        """
+        Split the data into train and test sets
+        """
+        pass
+
+    def __fill_missing_values__(self, data : pd.DataFrame) -> pd.DataFrame:
+        """
+        Fill missing values in the data
+        
+        1. Fill missing values of numerical features with mean of the column
+        2. Fill missing values of categorical features with "UNKNOWN_VALUE"
+        """
+        # replace whitespaced cells of numeric columns with NaN
+        data.replace(r'^\s*$', np.nan, regex=True, inplace=True)
+
+        numeric_features = data.select_dtypes(include=[np.number]).columns
+
+        categorical_features = list(set(data.columns) - set(numeric_features))
+
+        # fill missing values of numeric columns with mean of the column
+        if len(numeric_features) > 0:
+            imputer = SimpleImputer(missing_values=np.nan, strategy='mean')
+            data[numeric_features] = imputer.fit_transform(data[numeric_features])
+
+        # fill missing values of categorical columns with "UNKNOWN_VALUE"
+        if len(categorical_features) > 0:
+            data[categorical_features] = data[categorical_features].fillna("UNKNOWN_VALUE")
+
+        return data
 
     def fill_missing_values(self) -> pd.DataFrame:
         """
@@ -58,16 +89,7 @@ class Preprocessor:
         Normalize the numeric features
         """
         # normalize numeric features
-        scaler = scaler()
-        self.data[self.numeric_features] = scaler.fit_transform(self.data[self.numeric_features])
+        sc = scaler()
+        self.data[self.numeric_features] = sc.fit_transform(self.data[self.numeric_features])
 
         return self.data
-
-if __name__ == "__main__":
-    dataset = pd.read_csv('../datasets/WA_Fn-UseC_-Telco-Customer-Churn.csv')
-    X = dataset[dataset.columns[1:-1]]
-    preprocessor = Preprocessor(X)
-    X = preprocessor.fill_missing_values()
-    X = preprocessor.encode_categorical_features()
-    X = preprocessor.normalize()
-    print (X.head())
