@@ -34,6 +34,9 @@ class TelcoChurnPreprocessor(Preprocessor):
 class CreditCardPreprocessor(Preprocessor):
     def __init__(self) -> None:
         data = pd.read_csv('../datasets/creditcard.csv')
+
+        # only keep 20,000 of the negative examples and all other positive examples
+        data = pd.concat([data[data['Class'] == 1], data[data['Class'] == 0].sample(n=20000, random_state=42)])
         self.y = data['Class']
         data.drop(['Class'], axis=1, inplace=True)
 
@@ -299,10 +302,11 @@ if __name__ == "__main__":
     print("\nSelecting features...")
     X_train, X_test = select_k_features(X_train, X_test, Y_train, k=k)
 
+    k = int(input("\nEnter the number of epochs to train the model: "))
     # train the model
-    print("Training...")
+    print("\nTraining...")
     model = AdaBoost(LogisticRegression, error_threshold=0.5)
-    model.fit(X_train, Y_train, epochs=10)
+    model.fit(X_train, Y_train, epochs=k)
     print("Done training!")
 
     y_pred = model.predict(X_test)
@@ -311,3 +315,36 @@ if __name__ == "__main__":
     scores = report(model.predict(X_train), Y_train, y_pred, Y_test)
 
     print(scores)
+
+# if __name__ == "__main__":
+#     # for every dataset, for epochs of  5, 10, 15 and 20 run adaboost and generate report to a csv file
+#     datasets = [TelcoChurnPreprocessor, AdultPreprocessor, CreditCardPreprocessor]
+
+#     epochs = [5, 10, 15, 20]
+
+#     for dataset in datasets:
+#         preprocessor = dataset()
+#         preprocessor.preprocess()
+#         X_train, X_test, Y_train, Y_test = preprocessor.split()
+
+#         # convert to numpy arrays
+#         X_train = X_train.values
+#         X_test = X_test.values
+#         Y_train = Y_train.values
+#         Y_test = Y_test.values
+
+#         for epoch in epochs:
+#             # select k best features
+#             X_train, X_test = select_k_features(X_train, X_test, Y_train, k=20)
+
+#             # train the model
+#             model = AdaBoost(LogisticRegression, error_threshold=0.5)
+#             model.fit(X_train, Y_train, epochs=epoch)
+
+#             y_pred = model.predict(X_test)
+            
+#             scores = report(model.predict(X_train), Y_train, y_pred, Y_test)
+
+#             scores.to_csv(f"../results/{dataset.__name__}_{epoch}.csv")
+
+#             print(f"Done for {dataset.__name__} with {epoch} epochs")
