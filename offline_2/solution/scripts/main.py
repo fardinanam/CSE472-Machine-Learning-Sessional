@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 from preprocessing import Preprocessor
@@ -10,6 +11,9 @@ from sklearn.feature_selection import mutual_info_classif
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.preprocessing import MinMaxScaler
+from performance_metrices import specificity_score, accuracy_score, precision_score, recall_score, f1_score, false_discovery_rate
+from sklearn.linear_model import LogisticRegression as LR
+from sklearn.preprocessing import StandardScaler
 
 class TelcoChurnPreprocessor(Preprocessor):
     def __init__(self) -> None:
@@ -47,7 +51,7 @@ class CreditCardPreprocessor(Preprocessor):
     
     def preprocess(self) -> list:
         self.fill_missing_values()
-        self.normalize()
+        self.normalize(StandardScaler)
 
         return self.data, self.y
 
@@ -156,7 +160,7 @@ class AdultPreprocessor(Preprocessor):
 
     def preprocess(self) -> list:
         self.fill_missing_values()
-        self.normalize()
+        self.normalize(StandardScaler)
         self.encode_categorical_features()
 
         return self.X_train, self.X_test, self.y_train, self.y_test
@@ -176,59 +180,6 @@ def select_k_features(X_train : np.ndarray, X_test : np.ndarray, Y_train : np.nd
 
     return X_train, X_test
 
-def specificity_score(x, y):
-    """
-    Calculate the specificity score of the confusion matrix
-    """
-    cm = confusion_matrix(x, y)
-    tn, fp, fn, tp = cm.ravel()
-
-    return tn / (tn + fp)
-
-def accuracy_score(x, y):
-    """
-    Calculate the accuracy score of the confusion matrix
-    """
-    cm = confusion_matrix(x, y)
-    tn, fp, fn, tp = cm.ravel()
-
-    return (tp + tn) / (tp + tn + fp + fn)
-
-def precision_score(x, y):
-    """
-    Calculate the precision score of the confusion matrix
-    """
-    cm = confusion_matrix(x, y)
-    tn, fp, fn, tp = cm.ravel()
-
-    return tp / (tp + fp)
-
-def recall_score(x, y):
-    """
-    Calculate the recall score of the confusion matrix
-    """
-    cm = confusion_matrix(x, y)
-    tn, fp, fn, tp = cm.ravel()
-
-    return tp / (tp + fn)
-
-def f1_score(x, y):
-    """
-    Calculate the f1 score of the confusion matrix
-    """
-    cm = confusion_matrix(x, y)
-    tn, fp, fn, tp = cm.ravel()
-
-    return (2 * tp) / (2 * tp + fp + fn)
-
-def false_discovery_rate(x, y):
-    """
-    Calculate the false discovery rate of the confusion matrix
-    """
-    cm = confusion_matrix(x, y)
-    tn, fp, fn, tp = cm.ravel()
-
-    return fp / (tp + fp)
 
 def report(y_train_pred, y_train, y_test_pred, y_test):
     # Calculate scores for the training set
@@ -256,6 +207,7 @@ def report(y_train_pred, y_train, y_test_pred, y_test):
     return scores
 
 if __name__ == "__main__":
+    print("Running Adaboost\n")
     dataset = 0
 
     while dataset not in range(1, 4):
@@ -299,7 +251,7 @@ if __name__ == "__main__":
             print(f"Please enter a number between 1 and {X_train.shape[1]} or press Ctrl+C to exit")
 
     # select k best features
-    print("\nSelecting features...")
+    print("\nFeature Selection...")
     X_train, X_test = select_k_features(X_train, X_test, Y_train, k=k)
 
     k = int(input("\nEnter the number of epochs to train the model: "))
@@ -307,14 +259,74 @@ if __name__ == "__main__":
     print("\nTraining...")
     model = AdaBoost(LogisticRegression, error_threshold=0.5)
     model.fit(X_train, Y_train, epochs=k)
-    print("Done training!")
 
     y_pred = model.predict(X_test)
     
-    print("\nGenerating report...")
+    print("\nReport:")
     scores = report(model.predict(X_train), Y_train, y_pred, Y_test)
 
     print(scores)
+
+# if __name__ == "__main__":
+#     print("Running Logistic Regression\n")
+#     dataset = 0
+
+#     while dataset not in range(1, 4):
+#         print("Select dataset:")
+#         print("1. Telco Churn")
+#         print("2. Adult")
+#         print("3. Credit Card Fraud")
+#         print("0. to exit")
+
+#         dataset = int(input("Enter your choice: "))
+#         if dataset == 0:
+#             exit(0)
+
+#     preprocessor = None
+
+#     if dataset == 1:
+#         preprocessor = TelcoChurnPreprocessor()
+#     elif dataset == 2:
+#         preprocessor = AdultPreprocessor()
+#     elif dataset == 3:
+#         preprocessor = CreditCardPreprocessor()
+
+#     print("\nPreprocessing...")
+#     preprocessor.preprocess()
+    
+#     print("Splitting...")
+#     X_train, X_test, Y_train, Y_test = preprocessor.split()
+
+#     # convert to numpy arrays
+#     X_train = X_train.values
+#     X_test = X_test.values
+#     Y_train = Y_train.values
+#     Y_test = Y_test.values
+
+#     print(f"\nThe dataset contains {X_train.shape[1]} features")
+#     k = -1
+
+#     while k not in range(1, X_train.shape[1] + 1):
+#         k = int(input(f"Enter the number of features to select: "))
+#         if k not in range(1, X_train.shape[1] + 1):
+#             print(f"Please enter a number between 1 and {X_train.shape[1]} or press Ctrl+C to exit")
+
+#     # select k best features
+#     print("\nFeature Selection...")
+#     X_train, X_test = select_k_features(X_train, X_test, Y_train, k=k)
+
+#     k = int(input("\nEnter the number of epochs to train the model: "))
+#     # train the model
+#     print("\nTraining...")
+#     model = LogisticRegression(alpha=0.1, error_threshold=0)
+#     model.fit(X_train, Y_train, epochs=k)
+
+#     y_pred = model.predict(X_test)
+    
+#     print("\nReport:")
+#     scores = report(model.predict(X_train), Y_train, y_pred, Y_test)
+
+#     print(scores)
 
 # if __name__ == "__main__":
 #     # for every dataset, for epochs of  5, 10, 15 and 20 run adaboost and generate report to a csv file
@@ -345,6 +357,43 @@ if __name__ == "__main__":
             
 #             scores = report(model.predict(X_train), Y_train, y_pred, Y_test)
 
+#             if not os.path.exists("../results"):
+#                 os.makedirs("../results")
+
 #             scores.to_csv(f"../results/{dataset.__name__}_{epoch}.csv")
 
 #             print(f"Done for {dataset.__name__} with {epoch} epochs")
+
+# if __name__ == "__main__":
+#     # for every dataset, for epochs of  5, 10, 15 and 20 run adaboost and generate report to a csv file
+#     datasets = [TelcoChurnPreprocessor, AdultPreprocessor, CreditCardPreprocessor]
+
+#     for dataset in datasets:
+#         preprocessor = dataset()
+#         preprocessor.preprocess()
+#         X_train, X_test, Y_train, Y_test = preprocessor.split()
+
+#         # convert to numpy arrays
+#         X_train = X_train.values
+#         X_test = X_test.values
+#         Y_train = Y_train.values
+#         Y_test = Y_test.values
+
+#         epoch = 6000
+#         # select k best features
+#         X_train, X_test = select_k_features(X_train, X_test, Y_train, k=20)
+
+#         # train the model
+#         model = LogisticRegression(alpha=0.1, error_threshold=0)
+#         model.fit(X_train, Y_train, epochs=epoch)
+
+#         y_pred = model.predict(X_test)
+        
+#         scores = report(model.predict(X_train), Y_train, y_pred, Y_test)
+        
+#         if not os.path.exists("../results"):
+#             os.makedirs("../results")
+
+#         scores.to_csv(f"../results/{dataset.__name__}_logistic_regression.csv")
+
+#         print(f"Done for {dataset.__name__}")

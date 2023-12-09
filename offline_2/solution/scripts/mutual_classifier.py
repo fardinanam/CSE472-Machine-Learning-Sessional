@@ -12,39 +12,6 @@ def entropy(y : np.ndarray) -> float:
         entropy -= p * np.log2(p)
     return entropy
 
-# def remainder(X : np.ndarray, y : np.ndarray, feature_index : int) -> float:
-#     # find the number of examples
-#     n = y.size
-
-#     # find the number of unique values of the feature
-#     feature = X[:, feature_index]
-#     values = np.unique(feature).flatten()
-
-#     # find the remainder
-#     remainder = 0
-
-#     # check if the feature is continuous
-#     if len(values) > 10:
-#         # find the median of the feature
-#         median = np.median(values)
-#         # split the feature into two values
-#         values_less = values[values <= median].flatten()
-#         values_greater = values[values > median].flatten()
-#         values = np.concatenate((values_less, values_greater))
-
-#     for v in values:
-#         # find the indices of the examples with the value v
-#         indices = np.where(feature == v)[0]
-#         # find the number of examples with the value v
-#         n_v = indices.size
-#         # find the entropy of the examples with the value v
-#         y_v = y[indices]
-#         entropy_v = entropy(y_v)
-#         # find the remainder
-#         remainder += (n_v / n) * entropy_v
-
-#     return remainder
-
 def remainder(X : np.ndarray, y : np.ndarray, feature_index : int) -> float:
     feature = X[:, feature_index]
     n = y.size
@@ -72,29 +39,6 @@ def remainder(X : np.ndarray, y : np.ndarray, feature_index : int) -> float:
 
     return remainder    
 
-        
-
-# def remainder(X : np.ndarray, y : np.ndarray, feature_index : int) -> float:
-#     # find the number of examples
-#     n = y.size
-#     # find the number of unique values of the feature
-#     values = np.unique(X[:, feature_index])
-
-#     # find the remainder
-#     remainder = 0
-
-#     for v in values:
-#         # find the indices of the examples with the value v
-#         indices = np.where(X[:, feature_index] == v)[0]
-#         # find the number of examples with the value v
-#         n_v = indices.size
-#         # find the entropy of the examples with the value v
-#         y_v = y[indices]
-#         entropy_v = entropy(y_v)
-#         # find the remainder
-#         remainder += (n_v / n) * entropy_v
-#     return remainder
-
 def gain(X : np.ndarray, y : np.ndarray, feature_index : int) -> float:
     # find the entropy of y
     y_entropy = entropy(y)
@@ -115,8 +59,6 @@ def info_gain_score(X : np.ndarray, y : np.ndarray) -> np.ndarray:
         scores_[i] = gain(X, y, i)
 
     return scores_  
-
-    
 
 class SelectKBest():
     def __init__(self, score_func = info_gain_score, k : int=10):

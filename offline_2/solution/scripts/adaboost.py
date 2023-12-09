@@ -57,7 +57,7 @@ class AdaBoost(Learner):
             for i in range(n):
                 X_i = np.reshape(X[i], (1, -1))
                 if learner.predict(X_i) != y[i]:
-                    error += w[i]
+                    error += w[i].flatten()[0]
 
             if error > self.error_threshold:
                 self.z.append(math.log((1 - self.error_threshold) / self.error_threshold))
@@ -105,6 +105,3 @@ class AdaBoost(Learner):
                 y_pred[i] = 0
 
         return y_pred            
-
-
-

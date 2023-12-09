@@ -5,7 +5,8 @@ def sigmoid(z : np.ndarray) -> np.ndarray:
         return 1 / (1 + np.exp(-z))
 
 def losses(h : np.ndarray, y : np.ndarray) -> np.ndarray:
-    return -y * np.log(h) - (1 - y) * np.log(1 - h)
+    epsilon = 1e-7
+    return -y * np.log(h + epsilon) - (1 - y) * np.log(1 - h + epsilon)
 
 class Learner(ABC):
     @abstractmethod
