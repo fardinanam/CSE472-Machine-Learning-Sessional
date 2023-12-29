@@ -2,6 +2,9 @@ import numpy as np
 from loss_functions.loss_function import LossFunction
 
 class MSE(LossFunction):
+    """
+    Mean Squared Error loss function and its derivative
+    """
     def __init__(self):
         super().__init__()
         self.name = "mse"

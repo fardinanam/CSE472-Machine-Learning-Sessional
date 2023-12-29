@@ -14,7 +14,7 @@ class DenseLayer(Layer):
         self.weights = np.random.randn(output_size, input_size)
         self.biases = np.random.randn(output_size, 1)
 
-    def forward(self, input : np.ndarray) -> np.ndarray:
+    def forward(self, input : np.ndarray[any, np.dtype[float]]) -> np.ndarray[any, np.dtype[float]]:
         """
         Forward pass of the dense layer
 
@@ -32,7 +32,7 @@ class DenseLayer(Layer):
         self.output = np.dot(self.weights, input) + self.biases
         return self.output
 
-    def backward(self, output_gradients: np.ndarray, learning_rate: float) -> np.ndarray:
+    def backward(self, output_gradients: np.ndarray[any, np.dtype[float]], learning_rate: float) -> np.ndarray[any, np.dtype[float]]:
         """
         Backward pass of the dense layer
 

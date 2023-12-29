@@ -8,9 +8,9 @@ class Layer(ABC):
         self.output = None
 
     @abstractmethod
-    def forward(self, input : np.ndarray) -> np.ndarray:
+    def forward(self, input : np.ndarray[any, np.dtype[float]]) -> np.ndarray[any, np.dtype[float]]:
         pass
 
     @abstractmethod
-    def backward(self, output_gradients : np.ndarray, learning_rate : float) -> np.ndarray:
+    def backward(self, output_gradients : np.ndarray[any, np.dtype[float]], learning_rate : float) -> np.ndarray[any, np.dtype[float]]:
         pass

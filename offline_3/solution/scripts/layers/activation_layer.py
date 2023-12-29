@@ -3,7 +3,7 @@ from activation_functions.activation_function import ActivationFunction
 import numpy as np
 
 class ActivationLayer(Layer):
-    def __init__(self, f, df):
+    def __init__(self, f : function, df : function):
         super().__init__()
         self.name = "activation"
         self.f = f
