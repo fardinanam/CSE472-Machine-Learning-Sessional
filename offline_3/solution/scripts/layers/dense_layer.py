@@ -29,7 +29,10 @@ class DenseLayer(Layer):
             Output of the layer
         """
         self.input = input
+        # print(f"Input shape: {self.input.shape}")
+        # print(f"Weights shape: {self.weights.shape}")
         self.output = np.dot(self.weights, input) + self.biases
+
         return self.output
 
     def backward(self, output_gradients: np.ndarray[any, np.dtype[float]], learning_rate: float) -> np.ndarray[any, np.dtype[float]]:
@@ -48,8 +51,8 @@ class DenseLayer(Layer):
         np.ndarray of shape (input_size, batch_size)
             Gradients flowing into the layer
         """
-        self.weights -= learning_rate * np.dot(output_gradients, self.input.T)
-        self.biases -= learning_rate * output_gradients
+        self.weights -= np.dot(output_gradients, self.input.T) * learning_rate
+        self.biases -= learning_rate * np.sum(output_gradients, axis=1, keepdims=True)
 
         return np.dot(self.weights.T, output_gradients)
     

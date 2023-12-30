@@ -8,6 +8,11 @@ from loss_functions.mse import MSE
 X = np.reshape([[0, 0], [0, 1], [1, 0], [1, 1]], (4, 2, 1))
 Y = np.reshape([[0], [1], [1], [0]], (4, 1, 1))
 
+# create batches of size 2
+batch_size = 2
+X = np.reshape(X, (2, 2, 2))
+Y = np.reshape(Y, (2, 2, 1))
+
 network = [
     DenseLayer(2, 3),
     Tanh(),
@@ -20,10 +25,12 @@ loss = MSE()
 epochs = 10000
 learning_rate = 0.1
 
+print(f"shape of X: {X.shape}")
+
 for epoch in range(epochs):
     error = 0
     for x, y in zip(X, Y):
-        output = x
+        output = x.T
         for layer in network:
             output = layer.forward(output)
 
@@ -38,7 +45,7 @@ for epoch in range(epochs):
         print(f"Epoch {epoch} loss: {error}")
 
 for x, y in zip(X, Y):
-    output = x
+    output = x.T
     for layer in network:
         output = layer.forward(output)
     
