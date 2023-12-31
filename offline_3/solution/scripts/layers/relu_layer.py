@@ -3,9 +3,12 @@ import numpy as np
 
 class ReLU(ActivationLayer):
     def __init__(self):
-        f = lambda x: np.maximum(x, 0)
-        # if x > 0: return 1, else if x == 0 return 0.5 else return 0
-        df = lambda x: np.where(x > 0, 1, np.where(x == 0, 0.5, 0))
-
-        super().__init__(f, df)
+        super().__init__(self._f_, self._df_)
         self.name = "relu"
+
+    def _f_(self, input : np.ndarray) -> np.ndarray:
+        self.input = input
+        return np.maximum(input, 0)
+    
+    def _df_(self, input : np.ndarray) -> np.ndarray:
+        return np.where(input > 0, 1, np.where(input == 0, 0.5, 0))

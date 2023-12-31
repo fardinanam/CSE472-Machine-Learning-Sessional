@@ -3,6 +3,9 @@ import numpy as np
 
 class DenseLayer(Layer):
     def __init__(self, input_size : int, output_size : int, seed : int = 0):
+        assert input_size > 0, "Input size must be greater than 0"
+        assert output_size > 0, "Output size must be greater than 0"
+
         super().__init__()
         self.name = "dense"
         self.input_size = input_size
@@ -11,8 +14,11 @@ class DenseLayer(Layer):
         if seed != 0:
             np.random.seed(seed)
 
-        self.weights = np.random.randn(output_size, input_size)
-        self.biases = np.random.randn(output_size, 1)
+        # self.weights = np.random.randn(output_size, input_size)
+        # self.biases = np.random.randn(output_size, 1)
+        limit = np.sqrt(6 / (input_size + output_size))
+        self.weights = np.random.uniform(-limit, limit, size=(output_size, input_size))
+        self.biases = np.zeros((output_size, 1))
 
     def forward(self, input : np.ndarray[any, np.dtype[float]]) -> np.ndarray[any, np.dtype[float]]:
         """
@@ -51,10 +57,11 @@ class DenseLayer(Layer):
         np.ndarray of shape (input_size, batch_size)
             Gradients flowing into the layer
         """
-        self.weights -= np.dot(output_gradients, self.input.T) * learning_rate
-        self.biases -= learning_rate * np.sum(output_gradients, axis=1, keepdims=True)
+        self.input_gradients = np.dot(self.weights.T, output_gradients)
+        self.weights_gradients = np.dot(output_gradients, self.input.T)
+        self.biases_gradients = np.sum(output_gradients, axis=1, keepdims=True)
+        # self.weights -= self.weights_gradients * learning_rate
+        # self.biases -= learning_rate * self.biases_gradients
 
-        return np.dot(self.weights.T, output_gradients)
+        return self.input_gradients
     
-
-DenseLayer(3, 2)

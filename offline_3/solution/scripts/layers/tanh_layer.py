@@ -3,8 +3,12 @@ import numpy as np
 
 class Tanh(ActivationLayer):
     def __init__(self):
-        f = lambda x: np.tanh(x)
-        df = lambda x: 1 - np.square(np.tanh(x))
-
-        super().__init__(f, df)
+        super().__init__(self._f_, self._df_)
         self.name = "tanh"
+
+    def _f_(self, input : np.ndarray) -> np.ndarray:
+        self.input = input
+        return np.tanh(input)
+    
+    def _df_(self, input : np.ndarray) -> np.ndarray:
+        return 1 - np.square(np.tanh(input))
