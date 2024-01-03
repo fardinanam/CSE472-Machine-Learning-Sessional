@@ -6,22 +6,26 @@ from models.model import Model
 from tqdm import tqdm
 from layers.dense_layer import DenseLayer
 from layers.relu_layer import ReLU
+from layers.tanh_layer import Tanh
+from layers.sigmoid_layer import Sigmoid
 from layers.dropout_layer import DropoutLayer
 from optimizers.adam import AdamOptimizer
 from loss_functions.cross_entropy_loss import CrossEntropyLoss
 from performance import report_scores, report_confusion_matrix
-import pickle
 
-model_name = "dense_relu_dropout_dense_005"
+model_name = "dense_relu_dropout_dense_002"
 report_filename = "../reports/" + model_name + ".txt"
 pickle_filename = "../pickles/" + model_name + ".pkl"
+print_report = True
+
 # inintialize hyperparameters
 batch_size = 1024
-epochs = 50
-learning_rate = 0.005
+epochs = 15
+learning_rate = 0.002
 
 # initialize output file
-open(report_filename, "w").close()
+if print_report:
+    open(report_filename, "w").close()
 
 train_validation_dataset = ds.EMNIST(root = "../data", split = "letters", 
                                     train = True,
@@ -72,14 +76,19 @@ for epoch in tqdm(range(epochs)):
         model.backward(output_gradient)
 
         optimizer.step()
+    
+    if print_report:
+        report_scores(model, train_loader, epoch + 1,"Training", report_filename, False)
+        report_scores(model, validation_loader, epoch + 1,"Validation", report_filename, False)
 
-    # report training loss, trainig accuracy, validation loss, validation accuracy and validation macro f1 score
-    report_scores(model, train_loader, epoch + 1, loss,"Training", report_filename, False)
-    report_scores(model, validation_loader, epoch + 1, loss,"Validation", report_filename, False)
+# print final train and validation scores in console
+final_output_filename = "../reports/" + model_name + "_final_output.txt"
+open(final_output_filename, "w").close()
+report_scores(model, train_loader, 0, "Training", final_output_filename)
+report_scores(model, validation_loader, 0, "Validation", final_output_filename)
 
-
-report_confusion_matrix(model, train_loader, report_filename)
+if print_report:
+    report_confusion_matrix(model, train_loader, report_filename)
 
 # save model using pickle
-with open(pickle_filename, "wb") as f:
-    pickle.dump(model, f)
+model.save(pickle_filename)

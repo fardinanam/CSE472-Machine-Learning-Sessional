@@ -14,8 +14,6 @@ class DenseLayer(Layer):
         if seed != 0:
             np.random.seed(seed)
 
-        # self.weights = np.random.randn(output_size, input_size)
-        # self.biases = np.random.randn(output_size, 1)
         limit = np.sqrt(6 / (input_size + output_size))
         self.weights = np.random.uniform(-limit, limit, size=(output_size, input_size))
         self.biases = np.zeros((output_size, 1))
@@ -35,8 +33,6 @@ class DenseLayer(Layer):
             Output of the layer
         """
         self.input = input
-        # print(f"Input shape: {self.input.shape}")
-        # print(f"Weights shape: {self.weights.shape}")
         self.output = np.dot(self.weights, input) + self.biases
 
         return self.output
@@ -60,8 +56,6 @@ class DenseLayer(Layer):
         self.input_gradients = np.dot(self.weights.T, output_gradients)
         self.weights_gradients = np.dot(output_gradients, self.input.T)
         self.biases_gradients = np.sum(output_gradients, axis=1, keepdims=True)
-        # self.weights -= self.weights_gradients * learning_rate
-        # self.biases -= learning_rate * self.biases_gradients
 
         return self.input_gradients
     

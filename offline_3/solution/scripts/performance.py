@@ -16,28 +16,36 @@ def prediction(model : Model, loader : torch.utils.data.DataLoader):
 
     images = images.reshape(-1, 28 * 28).T
     output = model.predict(images)
-    output = np.argmax(output, axis = 0) + 1
+    # output = np.argmax(output, axis = 0) + 1
 
     return output, labels
 
-def report_scores(model : Model, loader : torch.utils.data.DataLoader, iteration : int , loss : LossFunction, name : str, report_filename : str, show : bool = True):
+def report_scores(model : Model, loader : torch.utils.data.DataLoader, iteration : int, name : str, report_filename : str, show : bool = True):
     output, labels = prediction(model, loader)
 
+    # one hot encode labels
+    size = labels.shape[0]
+    labels_one_hot = np.zeros((26, size))
+    labels_one_hot[labels - 1, np.arange(size)] = 1
+
+    loss = model.loss.f(output, labels_one_hot) / labels.shape[0]
+    output = np.argmax(output, axis = 0) + 1
     # save report
     with open(report_filename, "a") as f:
         f.write(f"{name} iteration: {iteration}\n")
-        f.write(f"{name} loss: {loss.f(output, labels)}\n")
+        f.write(f"{name} loss: {loss}\n")
         f.write(f"{name} accuracy: {accuracy_score(labels, output)}\n")
         f.write(f"{name} f1 score: {f1_score(labels, output, average = 'macro')}\n\n")
     
     if show:
         print(f"{name} iteration: {iteration}")
-        print(f"{name} loss: {loss.f(output, labels)}")
+        print(f"{name} loss: {loss}")
         print(f"{name} accuracy: {accuracy_score(labels, output)}")
         print(f"{name} f1 score: {f1_score(labels, output, average = 'macro')}")
 
 def report_confusion_matrix(model : Model, loader : torch.utils.data.DataLoader, report_filename : str):
     output, labels = prediction(model, loader)
-    
+    output = np.argmax(output, axis = 0) + 1
+
     with open(report_filename, "a") as f:
         f.write(f"{confusion_matrix(labels, output)}\n\n")

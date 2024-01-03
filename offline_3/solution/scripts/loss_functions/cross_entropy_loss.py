@@ -8,15 +8,6 @@ class CrossEntropyLoss(LossFunction):
         self.epsilon = 1e-8
     
     def softmax(self, x : np.ndarray[any, np.dtype[float]]) -> np.ndarray[any, np.dtype[float]]:
-        # check if x contains NaN or Inf
-        # if np.isnan(x).any():
-        #     # raise ValueError("x contains NaN")
-        #     print(x)
-
-        # if np.isinf(x).any():
-        #     # raise ValueError("x contains Inf")
-        #     print(x)
-
         x = x - np.max(x, axis=0)
         exp = np.exp(x)
         return exp / (np.sum(exp, axis=0) + self.epsilon)
