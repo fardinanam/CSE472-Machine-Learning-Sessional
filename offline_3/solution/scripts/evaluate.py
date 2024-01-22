@@ -5,7 +5,7 @@ import torch
 import numpy as np
 from performance import report_scores, report_confusion_matrix
 
-pickle_filename = "../pickles/dense_relu_dropout_dense_002.pkl"
+pickle_filename = "../pickles/dense_sigmoid_dropout_dense_001.pkl"
 report_filename = "../reports/emnist_model_report.txt"
 
 open(report_filename, "w").close()

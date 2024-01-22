@@ -3,6 +3,8 @@ import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, confusion_matrix
 from models.model import Model
 from loss_functions.loss_function import LossFunction
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def prediction(model : Model, loader : torch.utils.data.DataLoader):
     images = []
@@ -47,5 +49,17 @@ def report_confusion_matrix(model : Model, loader : torch.utils.data.DataLoader,
     output, labels = prediction(model, loader)
     output = np.argmax(output, axis = 0) + 1
 
-    with open(report_filename, "a") as f:
-        f.write(f"{confusion_matrix(labels, output)}\n\n")
+    # with open(report_filename, "a") as f:
+    #     f.write(f"{confusion_matrix(labels, output)}\n\n")
+
+    # use  seaborn to plot confusion matrix and save it
+    # use minimum padding
+    plt.figure(figsize = (14, 14))
+    sns.heatmap(confusion_matrix(labels, output), annot = True, fmt = 'g', cmap = 'Blues', cbar = False)
+
+    plt.title("Confusion Matrix")
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+
+    plt.subplots_adjust(left = 0.05, right = 0.95, top = 0.9)
+    plt.savefig(report_filename.replace(".txt", ".png"))
