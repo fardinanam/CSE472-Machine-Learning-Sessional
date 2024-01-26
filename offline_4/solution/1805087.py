@@ -43,7 +43,7 @@ import matplotlib.animation as animation
 from matplotlib.patches import Ellipse
 
 class GaussianMixture:
-    def __init__(self, n_components=1, tol=1e-5):
+    def __init__(self, n_components=1, tol=1e-4):
         """
         Parameters:
         -----------
@@ -223,6 +223,23 @@ class GaussianMixture:
             # Check for convergence
             if self._converged(data):
                 break
+                
+    def bic(self, data: np.array) -> float:
+        """
+        Compute the Bayesian Information Criterion (BIC) of the model.
+
+        Parameters:
+        -----------
+        data (np.array): The data to fit the model to.
+
+        Returns:
+        --------
+        float: The BIC.
+        """
+        n = data.shape[0]
+        k = self.n_components * (1 + data.shape[1] + (data.shape[1] * (data.shape[1] + 1)) / 2)
+
+        return np.log(n) * k - 2 * self._log_likelihood(data)
         
     def animate(self, data: np.array, frames: int = 40, save=False) -> None:
         """
@@ -328,7 +345,6 @@ for k in tqdm(range(min_k, max_k + 1)):
 
 # %% plot the log likelihoods vs. k graph
 log_likelihoods = [best_gmm.log_likelihood for best_gmm in best_gmms]
-best_gmm = best_gmms[np.argmax(log_likelihoods)]
 
 plt.plot(range(min_k, max_k + 1), log_likelihoods)
 plt.title('log likelihood vs. k')
@@ -339,7 +355,10 @@ plt.ylabel('log likelihood')
 plt.savefig('log-likelihoods.jpg')
 plt.show()
 
-# %% plot the original data points colored by their cluster assignments
+# %% find the best number of clusters and plot the original data points colored by their cluster assignments
+bic = [best_gmm.bic(data) for best_gmm in best_gmms]
+best_gmm = best_gmms[np.argmin(bic)]
+
 clusters = best_gmm.predict(data)
 
 plt.scatter(data[:, 0], data[:, 1], c=clusters, s=10, alpha=0.5)
@@ -348,5 +367,3 @@ plt.savefig('estimated-gmm-clusters.jpg')
 plt.show()
 
 best_gmm.animate(data, frames=60)
-
-
